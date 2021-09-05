@@ -1,19 +1,35 @@
-class UserController{
-  //async index(res,res){}
+var User=require("../models/User");
 
+class UserController{
+
+  //Rota de criação de usuários
   async create(req,res){
     console.log(req.body);
 
     var {email,name,password,role}=req.body;
     if(email==undefined || name==undefined || password==undefined || role==undefined ){
-      //res.sendStatus(400);
       res.status(400)
-      res.json({err:'Algo não foi preenchido'})
-    }else{
-      res.status(200);
-      res.send('Tudo ok');
+      res.json({err:'Algo não foi preenchido'});
+      return; //Garante que o que estiver depois não será executado
     }
-    
+
+    if(email.trim()=='' || name.trim()=='' || password.trim()=='' || role.trim()==''){
+      res.status(400)
+      res.json({err:'Algo não foi preenchido'});
+      return;
+    }
+
+    var busca=await User.findEmail(email);
+    if(busca){
+      res.status(406);
+      res.json({err:"Já existe um usuário cadastrado com esse e-mail"})
+      return;
+    }
+        
+    await User.new(email,password,name,role)
+    res.status(200);
+    res.send('OK!');
+
   }
 }
 
