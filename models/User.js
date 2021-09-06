@@ -1,6 +1,6 @@
 const knex=require("../database/connection")
 const bcrypt=require("bcrypt")
-const { edit } = require("../controllers/UserController")
+
 
 class User{
   
@@ -99,6 +99,22 @@ class User{
   
     }
   }
+
+  async delete(id){
+    let user=await this.findById(id);
+    if(user!=undefined){
+      try{
+        await knex.delete().where({id:id}).table("users")
+        return {status:true}
+      }catch(err){
+        return {status:false,err:err}
+      }
+      
+    }else{
+      return {status:false,err:"O usuário informado não existe"}
+    }
+  }
+
 }
 
 module.exports=new User();
