@@ -1,11 +1,12 @@
-var knex=require("../database/connection")
-var bcrypt=require("bcrypt")
+const knex=require("../database/connection")
+const bcrypt=require("bcrypt")
+const { edit } = require("../controllers/UserController")
 
 class User{
   
   async new(email,password,name,role){
     try{
-      var hash=await bcrypt.hash(password,5)
+      let hash=await bcrypt.hash(password,5)
       await knex.insert({email,password:hash,name,role}).table("users")
     }catch(err){
       console.log(err)
@@ -14,7 +15,7 @@ class User{
 
   async findEmail(email){
     try{
-      var result=await knex.select("*").from("users").where({email:email});
+      let result=await knex.select("*").from("users").where({email:email});
       if(result.length>0){
         return true;
       }else{
@@ -28,7 +29,7 @@ class User{
 
   async findAll(){
     try{
-      var result=await knex.select(["id","name","email","role"]).table("users")
+      let result=await knex.select(["id","name","email","role"]).table("users")
       return result;
     }catch(err){
       console.log(err)
@@ -38,7 +39,7 @@ class User{
 
   async findById(id){
     try{
-      var result=await knex.select(["id","name","email","role"]).where({id:id}).table("users")
+      let result=await knex.select(["id","name","email","role"]).where({id:id}).table("users")
 
       if(result.length>0){
         return result[0]
@@ -52,6 +53,52 @@ class User{
     }
   }
 
+  async update(id,email,name,role){
+
+    if(id==undefined){
+      return {status:false,err:"Id não informado"}
+    }
+
+    let user=await this.findById(id);
+    if(user==undefined){
+      return {status:false,err:"O usuário não existe"}
+    }else{
+      let editUser={}
+
+      if(email!=undefined && email.trim()!=''){
+        if(email!=user.email){
+          let result=await this.findEmail(email);
+          if(result==false){
+            editUser.email=email
+          }else{
+            return {status:false,err:"Já existe um outro usuário cadastrado com esse e-mail"}
+          }
+        }else{
+          return {status:false,err:"O e-mail é o mesmo cadastrado anteriormente"}
+        }
+      }
+
+      if(name!=undefined && name.trim()!=''){
+        editUser.name=name;
+      }
+
+      if(role!=undefined){
+        editUser.role=role;
+      }
+
+      if(Object.keys(editUser).length==0){
+        return {status:false,err:"O dados necessários não foram informados"}
+      }else{
+        try{
+          await knex.update(editUser).where({id:id}).table("users")
+          return {status:true}
+        }catch(err){
+          return {status:false,err:err}
+        }
+      }
+  
+    }
+  }
 }
 
 module.exports=new User();

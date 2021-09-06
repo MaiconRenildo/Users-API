@@ -1,4 +1,4 @@
-var User=require("../models/User");
+const User=require("../models/User");
 
 class UserController{
 
@@ -6,7 +6,7 @@ class UserController{
   async create(req,res){
     console.log(req.body);
 
-    var {email,name,password,role}=req.body;
+    let {email,name,password,role}=req.body;
     if(email==undefined || name==undefined || password==undefined || role==undefined ){
       res.status(400)
       res.json({err:'Algo não foi preenchido'});
@@ -19,7 +19,7 @@ class UserController{
       return;
     }
 
-    var busca=await User.findEmail(email);
+    let busca=await User.findEmail(email);
     if(busca){
       res.status(406);
       res.json({err:"Já existe um usuário cadastrado com esse e-mail"})
@@ -31,16 +31,16 @@ class UserController{
     res.send('OK!');
   }
 
-  //Rota de busca de usuários de todos os usuários
+  //Rota de busca de todos os usuários
   async find(req,res){
-    var users=await User.findAll();
+    let users=await User.findAll();
     res.json(users);
   }
 
   //Rota de busca de usuários por id
   async findUser(req,res){
-    var id=req.params.id;
-    var user=await User.findById(id);
+    let id=req.params.id;
+    let user=await User.findById(id);
     if(user==undefined){
       res.status(404);
       res.json({})
@@ -50,7 +50,18 @@ class UserController{
     }
   }
 
+  async edit(req,res){
+    var {id,name,role,email}=req.body;
+    let result=await User.update(id,email,name,role);
 
+    if(result.status){
+      res.status(200);
+      res.send('Dados atualizados com sucesso');
+    }else{
+      res.status(400);
+      res.json(result.err);
+    }
+  }
 }
 
 module.exports=new UserController();
