@@ -88,10 +88,28 @@ class UserController{
       res.json(result.token)
     }else{
       res.status(406)
-      res.json(result.err)
+      res.send(""+result.err)
     }
   }
 
+  async changePassword(req,res){
+    let token=req.body.token;
+    let password=req.body.password;
+
+    let validate=await PasswordToken.validate(token);
+
+    if(validate.status){
+      let userId=validate.token.user_id;
+
+      let result=await User.changePassword(password,userId,token);
+      res.status(200);
+      res.send("Senha alterada com sucesso")
+
+    }else{
+      res.status(406);
+      res.send("token invalido")
+    }
+  }
 
 }
 
