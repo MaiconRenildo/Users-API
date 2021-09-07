@@ -56,7 +56,7 @@ class User{
 
   async findByEmail(email){
     try{
-      let result=await knex.select(["id","name","email","role"]).where({email:email}).table("users")
+      let result=await knex.select(["id","name","password","email","role"]).where({email:email}).table("users")
 
       if(result.length>0){
         return result[0]
@@ -131,7 +131,6 @@ class User{
       return {status:false,err:"O usuário informado não existe"}
     }
   }
-
 
   async changePassword(newPassword,id,token){
     let hash=await bcrypt.hash(newPassword,5);

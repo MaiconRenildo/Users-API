@@ -33,7 +33,7 @@ class PasswordToken{
         if(tk.used){
           return {status:false};
         }else{
-          return {status:true,token:tk};///////////////////////////////////////////////ou tk ?
+          return {status:true,token:tk};
         }
       }else{
         return {status:false};

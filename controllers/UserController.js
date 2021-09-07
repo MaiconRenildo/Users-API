@@ -1,5 +1,8 @@
 const User=require("../models/User");
 const PasswordToken=require("../models/PasswordToken")
+const jwt=require("jsonwebtoken")
+const bcrypt=require("bcrypt")
+const secret="jhdsjadkahdjashdkjhanmmc23vnxmcv5448njds54ifeijfiesjkfsldfj"
 
 class UserController{
 
@@ -51,6 +54,7 @@ class UserController{
     }
   }
 
+  //Rota de edição de usuários
   async edit(req,res){
     var {id,name,role,email}=req.body;
     let result=await User.update(id,email,name,role);
@@ -64,6 +68,7 @@ class UserController{
     }
   }
 
+  //Rota de deleção de usuários
   async remove(req,res){
     let id=req.params.id;
 
@@ -77,6 +82,7 @@ class UserController{
     }
   }
 
+  //Rota de criação do token
   async recoverPassword(req,res){
     let email=req.body.email;
 
@@ -92,6 +98,7 @@ class UserController{
     }
   }
 
+  //Rota de alteração de senha
   async changePassword(req,res){
     let token=req.body.token;
     let password=req.body.password;
@@ -108,6 +115,27 @@ class UserController{
     }else{
       res.status(406);
       res.send("token invalido")
+    }
+  }
+
+  async login(req,res){
+    let {email,password}=req.body;
+
+    let user=await User.findByEmail(email);
+
+    if(user!=undefined){
+      let result=await bcrypt.compare(password,user.password)
+
+      if(result){
+        let token=jwt.sign({email:user.email,role:user.role},secret);
+        res.status(200);
+        res.json({token:token})
+      }else{
+        res.status(406);
+        res.send("Senha incorreta")
+      }
+    }else{
+      res.json({status:false})
     }
   }
 
