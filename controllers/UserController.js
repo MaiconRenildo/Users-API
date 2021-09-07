@@ -1,4 +1,5 @@
 const User=require("../models/User");
+const PasswordToken=require("../models/PasswordToken")
 
 class UserController{
 
@@ -75,6 +76,23 @@ class UserController{
       res.json(result.err)
     }
   }
+
+  async recoverPassword(req,res){
+    let email=req.body.email;
+
+    let result=await PasswordToken.create(email)
+    if(result.status){
+
+      //Nodemailer.send()
+      res.status(200);
+      res.json(result.token)
+    }else{
+      res.status(406)
+      res.json(result.err)
+    }
+  }
+
+
 }
 
 module.exports=new UserController();
