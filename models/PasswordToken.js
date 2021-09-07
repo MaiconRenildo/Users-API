@@ -14,7 +14,6 @@ class PasswordToken{
           used:0,
           token:token
         }).table("passwordtokens");
-
         return {status:true,token:token}
   
       }catch(err){
@@ -23,6 +22,24 @@ class PasswordToken{
       
     }else{
       return {status:false,err:"O e-mail informado não existe no banco."}
+    }
+  }
+
+  async validate(token){
+    try{
+      let result=await knex.select().where({token:token}).table("passwordtokens");
+      if(result.length>0){
+        let tk=result[0];
+        if(tk.used){
+          return false;
+        }else{
+          return true;
+        }
+      }else{
+        return false;
+      }
+    }catch(err){
+      return false;
     }
   }
 
