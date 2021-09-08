@@ -127,6 +127,7 @@ class UserController{
       let result=await bcrypt.compare(password,user.password)
 
       if(result){
+        //Criação do token jwt
         let token=jwt.sign({email:user.email,role:user.role},secret);
         res.status(200);
         res.json({token:token})
