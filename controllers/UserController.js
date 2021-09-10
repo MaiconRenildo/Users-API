@@ -17,7 +17,7 @@ class UserController{
       return; //Garante que o que estiver depois não será executado
     }
 
-    if(email.trim()=='' || name.trim()=='' || password.trim()=='' || role.trim()==''){
+    if(email.trim()=='' || name.trim()=='' || password.trim()==''){
       res.status(400)
       res.json({err:'Algo não foi preenchido'});
       return;
