@@ -9,7 +9,7 @@ module.exports=function(req,res,next){
     const token=bearer[1];
 
     try{
-      const decoded=jwt.verify(token,secret)
+      const decoded=jwt.verify(token,secret)  //Decodifica o token
 
       if(decoded.role==1){
         console.log(decoded)
@@ -29,7 +29,7 @@ module.exports=function(req,res,next){
 
   }else{
     res.status(403);
-    res.send("Você ão está autenticado")
+    res.send("Você não está autenticado")
     return;
   }
 }

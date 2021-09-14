@@ -1,88 +1,116 @@
 const User=require("../models/User");
-const PasswordToken=require("../models/PasswordToken")
-const jwt=require("jsonwebtoken")
+//const PasswordToken=require("../models/PasswordToken")
+//const Validation=require('../models/Validation')
+
 const bcrypt=require("bcrypt")
+const jwt=require("jsonwebtoken")
 const secret="jhdsjadkahdjashdkjhanmmc23vnxmcv5448njds54ifeijfiesjkfsldfj"
+
 
 class UserController{
 
-  //Rota de criação de usuários
+
+  ////////////////Usuário comum
+
+  //Rota de criação de usuários OK
   async create(req,res){
-    console.log(req.body);
-
     let {email,name,password,role}=req.body;
-    if(email==undefined || name==undefined || password==undefined || role==undefined ){
-      res.status(400)
-      res.json({err:'Algo não foi preenchido'});
-      return; //Garante que o que estiver depois não será executado
-    }
 
-    if(email.trim()=='' || name.trim()=='' || password.trim()==''){
-      res.status(400)
-      res.json({err:'Algo não foi preenchido'});
-      return;
-    }
-
-    let busca=await User.findEmail(email);
-    if(busca){
-      res.status(406);
-      res.json({err:"Já existe um usuário cadastrado com esse e-mail"})
-      return;
-    }
-        
-    await User.new(email,password,name,role)
-    res.status(200);
-    res.send('OK!');
-  }
-
-  //Rota de busca de todos os usuários
-  async find(req,res){
-    let users=await User.findAll();
-    res.json(users);
-  }
-
-  //Rota de busca de usuários por id
-  async findUser(req,res){
-    let id=req.params.id;
-    let user=await User.findById(id);
-    if(user==undefined){
-      res.status(404);
-      res.json({})
-    }else{
-      res.status(200);
-      res.json(user);
-    }
-  }
-
-  //Rota de edição de usuários
-  async edit(req,res){
-    var {id,name,role,email}=req.body;
-    let result=await User.update(id,email,name,role);
-
+    let result=await User.new(email,password,name,role)
     if(result.status){
-      res.status(200);
-      res.send('Dados atualizados com sucesso');
+      res.status(result.statusCode);
+      res.send('Usuário cadastrado com sucesso');
     }else{
-      res.status(400);
+      res.status(result.statusCode);
+      res.json(result.err)
+    }
+  }
+
+  //Rota de busca de todos os usuários OK
+  async find(req,res){
+    let result=await User.findAll();
+    if(result.status){
+      res.status(result.statusCode)
+      res.json(result.res);
+    }else{
+      res.status(result.statusCode)
       res.json(result.err);
     }
   }
 
-  //Rota de deleção de usuários
+  //Rota de busca de usuários por id OK
+  async findUser(req,res){
+    let id=req.params.id;
+    let result=await User.findById(id);
+    if(result.status){
+      res.status(result.statusCode);
+      res.json(result.res);
+    }else{
+      res.status(result.statusCode);
+      res.json(result.err)
+    }
+  }
+
+
+  ////////////////Admin
+
+  //Rota de edição de usuários  OK
+  async edit(req,res){
+    var {id,name,role,email}=req.body;
+    let result=await User.update(id,email,name,role);
+    
+    if(result.status){
+      res.status(result.statusCode);
+      res.send('Dados atualizados com sucesso');
+    }else{
+      res.status(result.statusCode);   
+      res.json(result.err);
+    }
+  }
+
+  //Rota de deleção de usuários OK
   async remove(req,res){
     let id=req.params.id;
 
     let result=await User.delete(id)
     if(result.status){
-      res.status(200);
+      res.status(result.statusCode);
       res.send("Usuário deletado com sucesso")
     }else{
-      res.status(406);
+      res.status(result.statusCode);
       res.json(result.err)
     }
   }
 
-  //Rota de criação do token
+  //Rota de Login OK
+  async login(req,res){
+    let {email,password}=req.body;
+
+    let result=await User.findByEmail(email);
+
+    if(result.status){
+      let comparation=await bcrypt.compare(password,result.res.password)
+
+      if(comparation){
+        let token=jwt.sign({email:result.res.email,role:result.res.role},secret);
+        res.status(result.statusCode);
+        res.json({token:token})
+      }else{
+        res.status(401);
+        res.json("Senha incorreta")
+      }
+    }else{
+      res.status(404);
+      res.json(result.err)
+    }
+  }
+
+  
+
+
+
+  ///////////////Recuperação de senha - Não finalizado
+  //Rota de criação do token  NOT
   async recoverPassword(req,res){
     let email=req.body.email;
 
@@ -98,7 +126,7 @@ class UserController{
     }
   }
 
-  //Rota de alteração de senha
+  //Rota de alteração de senha  NOT
   async changePassword(req,res){
     let token=req.body.token;
     let password=req.body.password;
@@ -117,29 +145,7 @@ class UserController{
       res.send("token invalido")
     }
   }
-
-  async login(req,res){
-    let {email,password}=req.body;
-
-    let user=await User.findByEmail(email);
-
-    if(user!=undefined){
-      let result=await bcrypt.compare(password,user.password)
-
-      if(result){
-        //Criação do token jwt
-        let token=jwt.sign({email:user.email,role:user.role},secret);
-        res.status(200);
-        res.json({token:token})
-      }else{
-        res.status(406);
-        res.send("Senha incorreta")
-      }
-    }else{
-      res.json({status:false})
-    }
-  }
-
+  
 }
 
 module.exports=new UserController();
