@@ -149,7 +149,6 @@ class User{
       }catch(err){
         return {status:false,statusCode:400,err:err}
       }
-      
     }else{
       return {status:false,statusCode:404,err:"O usuário informado não existe"}
     }

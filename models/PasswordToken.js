@@ -6,7 +6,6 @@ const Email=require('../email/sendEmail')
 
 class PasswordToken{
 
-  //Cadastro do token e da data no banco de dados  OK
   async create(email){
     let result=await User.findByEmail(email);
     if(result.status){
@@ -20,7 +19,6 @@ class PasswordToken{
           token:token,
           date:date
         }).table("passwordtokens");
-        //O token está sendo retornado aqui apenas para fins de teste
 
         try{
           await Email.send(result.res.name,result.res.email,token)
@@ -28,7 +26,7 @@ class PasswordToken{
         }catch(err){
           return {status:false,statusCode:400,err:err}
         }
-        //return {status:true,statusCode:200,token:token,email:result.res.email}
+
       }catch(err){
         return {status:false,statusCode:400,err:err}
       }
@@ -47,7 +45,6 @@ class PasswordToken{
     return uuid;
   }
   
-  //Recebe o token e valida
   async validate(token){
     try{
       let result=await knex.select().where({token:token}).table("passwordtokens");
@@ -75,8 +72,6 @@ class PasswordToken{
   timeValidation(before){
     const difference=1800000  //Tempo em ms -> Equivale a 30min
     let now=Date.now()
-    console.log(now)
-    console.log(now-before)
     if(now-before>difference){
       return false;
     }else{
@@ -109,8 +104,6 @@ class PasswordToken{
 
     //Verifica se o id do token bate com o id do usuário
     if(resultId.res.id!=resultToken.id){
-      console.log(resultId)
-      console.log(resultToken)
       return {status:false,statusCode:400,err:'O token não pertence a este usuário'};
     }
 
@@ -126,9 +119,7 @@ class PasswordToken{
   }
   
   async setUsed(token){
-    console.log("inicio")
     await knex.update({used:1}).where({token:token}).table("passwordtokens");
-    console.log('fim')
   }  
 }
 

@@ -9,10 +9,7 @@ const secret="jhdsjadkahdjashdkjhanmmc23vnxmcv5448njds54ifeijfiesjkfsldfj"
 
 class UserController{
 
-
-  ////////////////Usuário comum
-
-  //Rota de criação de usuários OK
+  //Rota de criação de usuários 
   async create(req,res){
     let {email,name,password,role}=req.body;
 
@@ -26,7 +23,7 @@ class UserController{
     }
   }
 
-  //Rota de busca de todos os usuários OK
+  //Rota de busca de todos os usuários
   async find(req,res){
     let result=await User.findAll();
     if(result.status){
@@ -38,7 +35,7 @@ class UserController{
     }
   }
 
-  //Rota de busca de usuários por id OK
+  //Rota de busca de usuários por id 
   async findUser(req,res){
     let id=req.params.id;
     let result=await User.findById(id);
@@ -51,14 +48,10 @@ class UserController{
     }
   }
 
-
-  ////////////////Admin
-
-  //Rota de edição de usuários  OK
+  //Rota de edição de usuários
   async edit(req,res){
     var {id,name,role,email}=req.body;
     let result=await User.update(id,email,name,role);
-    
     if(result.status){
       res.status(result.statusCode);
       res.send('Dados atualizados com sucesso');
@@ -68,10 +61,9 @@ class UserController{
     }
   }
 
-  //Rota de deleção de usuários OK
+  //Rota de deleção de usuários 
   async remove(req,res){
     let id=req.params.id;
-
     let result=await User.delete(id)
     if(result.status){
       res.status(result.statusCode);
@@ -82,17 +74,14 @@ class UserController{
     }
   }
 
-  //Rota de Login OK
+  //Rota de Login
   async login(req,res){
     let {email,password}=req.body;
-
     let result=await User.findByEmail(email);
-
     if(result.status){
       let comparation=await bcrypt.compare(password,result.res.password)
-
       if(comparation){
-        let token=jwt.sign({email:result.res.email,role:result.res.role},secret);
+        let token=jwt.sign({email:result.res.email,role:result.res.role},secret,{expiresIn:"24h"});
         res.status(result.statusCode);
         res.json({token:token})
       }else{
@@ -105,28 +94,22 @@ class UserController{
     }
   }
 
-  ///////////////Recuperação de senha
-  //Rota de criação do token  OK
+  //Rota de criação do token para recuperação de senha
   async recoverPassword(req,res){
     let email=req.body.email;
-
     let result=await PasswordToken.create(email)
     if(result.status){
-
-      //Nodemailer.send()
       res.status(200);
-      res.json({token:result.token,email:result.email})
-      
+      res.json({email:result.email})
     }else{
       res.status(406)
-      res.send(""+result.err)
+      res.send(result.err)
     }
   }
 
-  //Rota de validação do token  OK
+  //Rota de validação do token  para recuperação de senha
   async tokenValidate(req,res){
     let token=req.body.token;
-
     let validate=await PasswordToken.validate(token);
     if(validate.status){
       res.status(200);
@@ -137,13 +120,11 @@ class UserController{
     }
   }
 
-  //Muda a senha  OK
+  //Rota de mudança de senha
   async changePass(req,res){
-    //let token=req.params.token;
     let token=req.body.token
     let id=req.body.id;
     let newPassword=req.body.password
-
     let result=await PasswordToken.changePassword(newPassword,id,token);
     if(result.status){
       res.status(result.statusCode);
