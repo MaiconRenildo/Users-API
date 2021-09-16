@@ -105,50 +105,7 @@ class UserController{
     }
   }
 
-  
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  ///////////////Recuperação de senha - Não finalizado
+  ///////////////Recuperação de senha
   //Rota de criação do token  OK
   async recoverPassword(req,res){
     let email=req.body.email;
@@ -158,7 +115,7 @@ class UserController{
 
       //Nodemailer.send()
       res.status(200);
-      res.json(result.token)
+      res.json({token:result.token,email:result.email})
       
     }else{
       res.status(406)
@@ -169,7 +126,6 @@ class UserController{
   //Rota de validação do token  OK
   async tokenValidate(req,res){
     let token=req.body.token;
-    //let password=req.body.password;
 
     let validate=await PasswordToken.validate(token);
     if(validate.status){
@@ -200,15 +156,3 @@ class UserController{
 }
 
 module.exports=new UserController();
-
-
-  /*
-    sla(req,res){
-    let valor=PasswordToken.slazin();
-    if(valor==1){
-      res.send('foi')
-    }else{
-      res.send('não foi')
-    }
-  }
-  */

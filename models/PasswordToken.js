@@ -1,6 +1,7 @@
 const knex=require("../database/connection")
 const User=require('./User.js')
 const Validation=require('./Validation')
+const bcrypt=require("bcrypt")
 
 class PasswordToken{
 
@@ -102,14 +103,17 @@ class PasswordToken{
     }
 
     //Verifica se o id do token bate com o id do usuário
-    if(resultId.id!=resultToken.id){
+    if(resultId.res.id!=resultToken.id){
+      console.log(resultId)
+      console.log(resultToken)
       return {status:false,statusCode:400,err:'O token não pertence a este usuário'};
     }
 
+    //Cria a nova senha
     let hash=await bcrypt.hash(newPassword,5);
     try{
       await knex.update({password:hash}).where({id:id}).table("users");
-      await PasswordToken.setUsed(token);
+      await this.setUsed(token);
       return {status:true,statusCode:200,res:'Senha atualizada com sucesso'}
     }catch(err){
       return {status:false,statusCode:400,err:err};
@@ -117,9 +121,10 @@ class PasswordToken{
   }
   
   async setUsed(token){
+    console.log("inicio")
     await knex.update({used:1}).where({token:token}).table("passwordtokens");
+    console.log('fim')
   }  
-
 }
 
 module.exports=new PasswordToken();

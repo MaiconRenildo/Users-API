@@ -14,9 +14,8 @@ router.post("/login",UserController.login)
 
 router.post("/recoverpassword",UserController.recoverPassword)
 router.post("/tokenValidate",UserController.tokenValidate)
+router.post('/changePassword',UserController.changePass)
 
 router.post('/validate',AdminAuth,HomeController.validate)
-
-//router.get('/sla',UserController.sla)
 
 module.exports = router;
