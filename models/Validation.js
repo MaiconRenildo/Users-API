@@ -41,6 +41,17 @@ class Validation{
     }
     return true;
   }
+
+  id(value){
+    let a=isNaN(value);
+    if(a){
+      return false;
+    }
+    if(value<0){
+      return false;
+    }
+    return true;
+  }
 }
 
 module.exports=new Validation();

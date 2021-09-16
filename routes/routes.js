@@ -10,10 +10,13 @@ router.get('/user',AdminAuth,UserController.find)
 router.get('/user/:id',AdminAuth,UserController.findUser)
 router.put('/user',AdminAuth,UserController.edit)
 router.delete('/user/:id',AdminAuth,UserController.remove)
-router.post("/recoverpassword",UserController.recoverPassword)
-router.post("/changepassword",UserController.changePassword)
 router.post("/login",UserController.login)
 
+router.post("/recoverpassword",UserController.recoverPassword)
+router.post("/tokenValidate",UserController.tokenValidate)
+
 router.post('/validate',AdminAuth,HomeController.validate)
+
+//router.get('/sla',UserController.sla)
 
 module.exports = router;

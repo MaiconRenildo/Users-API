@@ -1,5 +1,5 @@
 const User=require("../models/User");
-//const PasswordToken=require("../models/PasswordToken")
+const PasswordToken=require("../models/PasswordToken")
 //const Validation=require('../models/Validation')
 
 const bcrypt=require("bcrypt")
@@ -109,8 +109,47 @@ class UserController{
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   ///////////////Recuperação de senha - Não finalizado
-  //Rota de criação do token  NOT
+  //Rota de criação do token  OK
   async recoverPassword(req,res){
     let email=req.body.email;
 
@@ -120,32 +159,56 @@ class UserController{
       //Nodemailer.send()
       res.status(200);
       res.json(result.token)
+      
     }else{
       res.status(406)
       res.send(""+result.err)
     }
   }
 
-  //Rota de alteração de senha  NOT
-  async changePassword(req,res){
+  //Rota de validação do token  OK
+  async tokenValidate(req,res){
     let token=req.body.token;
-    let password=req.body.password;
+    //let password=req.body.password;
 
     let validate=await PasswordToken.validate(token);
-
     if(validate.status){
-      let userId=validate.token.user_id;
-
-      let result=await User.changePassword(password,userId,token);
       res.status(200);
-      res.send("Senha alterada com sucesso")
-
+      res.json({token:token,id:validate.id})
     }else{
-      res.status(406);
-      res.send("token invalido")
+      res.status(validate.statusCode);
+      res.send(validate.err)
     }
   }
-  
+
+  //Muda a senha  OK
+  async changePass(req,res){
+    //let token=req.params.token;
+    let token=req.body.token
+    let id=req.body.id;
+    let newPassword=req.body.password
+
+    let result=await PasswordToken.changePassword(newPassword,id,token);
+    if(result.status){
+      res.status(result.statusCode);
+      res.json(result.res)
+    }else{
+      res.status(result.statusCode);
+      res.json(result.err)
+    }
+  }
 }
 
 module.exports=new UserController();
+
+
+  /*
+    sla(req,res){
+    let valor=PasswordToken.slazin();
+    if(valor==1){
+      res.send('foi')
+    }else{
+      res.send('não foi')
+    }
+  }
+  */
