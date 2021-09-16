@@ -154,10 +154,6 @@ class User{
       return {status:false,statusCode:404,err:"O usuário informado não existe"}
     }
   }
-
-  sla(){
-    return 1
-  }
 }
 
 module.exports=new User();

@@ -2,6 +2,7 @@ const knex=require("../database/connection")
 const User=require('./User.js')
 const Validation=require('./Validation')
 const bcrypt=require("bcrypt")
+const Email=require('../email/sendEmail')
 
 class PasswordToken{
 
@@ -20,12 +21,17 @@ class PasswordToken{
           date:date
         }).table("passwordtokens");
         //O token está sendo retornado aqui apenas para fins de teste
-        return {status:true,statusCode:200,token:token,email:result.res.email}
-  
+
+        try{
+          await Email.send(result.res.name,result.res.email,token)
+          return {status:true,statusCode:200,email:result.res.email}
+        }catch(err){
+          return {status:false,statusCode:400,err:err}
+        }
+        //return {status:true,statusCode:200,token:token,email:result.res.email}
       }catch(err){
         return {status:false,statusCode:400,err:err}
       }
-      
     }else{
       return {status:false,statusCode:404,err:"O e-mail informado não existe no banco."}
     }
@@ -40,7 +46,6 @@ class PasswordToken{
     });
     return uuid;
   }
-
   
   //Recebe o token e valida
   async validate(token){
@@ -128,13 +133,3 @@ class PasswordToken{
 }
 
 module.exports=new PasswordToken();
-
-
-//Informa o e-mail e o token é criado
-// O token é enviado para o e-mail
-//Informa e valida o token-> muda-se para uma rota que tenha o token como parametro
-//Pede a senha
-//Valida a senha
-//Envia a senha e o token
-//Cadastra a senha e seta o used
-
