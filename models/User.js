@@ -17,7 +17,7 @@ class User{
       return {status:false,statusCode:400,err:"E-mail inválido"}
     }
 
-    let busca=await User.findEmail(email);
+    let busca=await this.findEmail(email);
     if(busca){
       return {status:false,statusCode:400,err:"Já existe um usuário cadastrado com esse e-mail"}
     }
