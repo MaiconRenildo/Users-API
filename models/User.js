@@ -115,7 +115,7 @@ class User{
       }
 
       //Se o e-mail for diferente do atual, verifica se existe outro usuário cadastrado com o novo e-mail
-      if(email!=user.email){
+      if(email!=user.res.email){
         let result=await this.findEmail(email);
         if(result==false){
           editUser.email=email
